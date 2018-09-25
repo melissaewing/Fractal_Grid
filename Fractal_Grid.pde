@@ -1,33 +1,45 @@
+// @author Melissa Ewing
+// Recursively generates crumpled grid with random variation depending on mouse position.
+
 import processing.pdf.*;
 
 int maxlevel = 7;
 int  w = 800, h = 800;
 int borderRatio = 8;  // grid is surrounded by a border that is a fraction of the width/height
-float startrng = 180; // higher range = greater randomness in placing points (the more "crumpled" the grid looks)
+float startrng = 0; // higher range = greater randomness in placing points (the more "crumpled" the grid looks)
+float lastrng = -1;
+int numVertices;
+
+Vertex[][] grid;
 
 void setup() {
-  noLoop();
   size(w,h);
   background(255);
   strokeWeight(.8);
-}
-
-void draw() {
   
   // Calculate total number of vertices in the grid ahead of time
-  int numVertices = 2;
+  numVertices = 2;
   for (int i = 1; i <= maxlevel; i++) {
     numVertices += pow(2,i-1);
   }
-  
-  Vertex[][] grid =  makeGrid(numVertices);
-  drawGrid(grid, numVertices);
-  
+}
+
+void draw() {
+  if (lastrng != startrng) {
+    background(255);
+    grid =  makeGrid();
+    drawGrid();
+    lastrng = startrng;
+  }
+}
+
+void mouseMoved() {
+   startrng = map(mouseX, 0, width, 0, 230);
 }
 
 // Draws the lines (left to right and top to bottom) 
 // between vertices of the grid
-void drawGrid(Vertex[][] grid, int numVertices) {
+void drawGrid() {
   
   for (int i = 0; i < numVertices; i++) {
     for (int j = 0; j < numVertices; j++) {
@@ -47,7 +59,7 @@ void drawGrid(Vertex[][] grid, int numVertices) {
 // Generates initial fractal grid starting with four corner vertices.
 // Stores points in vertex array called grid 
 // Calls recursive function to do the rest of the work
-Vertex[][] makeGrid(int numVertices) {
+Vertex[][] makeGrid() {
   
   // first four vertices determine the outline of the grid
   // start in four corners offset by border that is a fraction of the width/height
@@ -125,7 +137,7 @@ void keyPressed() {
 // Vertex class keeps track of a vertex's location on the screen 
 // as well as index in the Vertex[][] grid.
 class Vertex {
-  //vertex knows about its location and index
+  //vertex has location and index
   float x,y;
   //x and y index
   int xi,yi;
